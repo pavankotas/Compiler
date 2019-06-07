@@ -37,11 +37,12 @@ class Analyzer(ast.NodeVisitor):
     def visit_Call(self,node):
         for field, value in ast.iter_fields(node):
             if isinstance(value, ast.Attribute):
-
+                if value.attr in ["compile"]:
+                    Analyzer.calls.append(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
                 if value.attr in ["fit","fit_generator"]:
-                    print('-----------------')
-                    print(value.attr)
-                    print('-----------------')
+                    # print('-----------------')
+                    # print(value.attr)
+                    # print('-----------------')
                     Analyzer.calls.append(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
                     args = node.args
                     for arg in args:
@@ -80,19 +81,20 @@ class Analyzer(ast.NodeVisitor):
 
 #This class takes the tree as input and
 # traces back the variables of fit functions
-class Tracer(ast.NodeVisitor):
+class Tracker(ast.NodeVisitor):
 
+    paramsStatements = []
     def visit_Assign(self, node):
         if isinstance(node.targets[0], ast.Name):
             if node.targets[0].id in traceParams:
-                print(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
+                Tracker.paramsStatements.append(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
         elif isinstance(node.targets[0], ast.Tuple):
             for k in node.targets[0].elts:
                 if isinstance(k.id, ast.Name):
                     if k.id in traceParams:
-                        print(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
+                        Tracker.paramsStatements(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
         else:
-            print(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
+            Tracker.paramsStatements(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
         # if node.targets[0].id in traceParams:
         #     print(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
 
@@ -155,11 +157,11 @@ class NNExtracter(ast.NodeVisitor):
 # filename- filename to be created in the output
 def iterator(ls, message, filename):
     file = open(filename,'a');
-    # file.write("\n"+ message+": \n")
-    # print(message+": \n")
+    file.write("\n\n"+ message+": \n")
+    file.write("-------------------------- \n")
     for ob in ls:
         # print(ob)
-        file.write(ob)
+        file.write(str(ob))
 
     file.close()
 
@@ -169,15 +171,16 @@ def main():
     tree = astor.code_to_ast.parse_file('cnn.py')
     analyzer = Analyzer()
     analyzer.visit(tree)
-    # iterator(analyzer.imports,"Import Statements","imports.txt")
-    # iterator(analyzer.importFroms, "Import From Statements","imports.txt")
-    # iterator(analyzer.calls, "Other call functions","calls.txt")
-    print(analyzer.fitParams)
-    tracer = Tracer()
-    tracer.visit(tree)
-    # GlobalUseCollector(Analyzer.nn_target_id).visit(tree)
-    # NNExtracter().visit(tree);
-    # iterator(NNExtracter.cnnStatements, "Neural Network","nn.txt")
+    iterator(analyzer.imports,"Import Statements","imports.txt")
+    iterator(analyzer.importFroms, "Import From Statements","imports.txt")
+    iterator(analyzer.calls, "Function calls","calls.txt")
+    iterator(analyzer.fitParams,"Fit Parameters","fitparams.txt")
+    tracker = Tracker()
+    tracker.visit(tree)
+    iterator(tracker.paramsStatements,"Parameters backtrack","fitparams.txt")
+    GlobalUseCollector(Analyzer.nn_target_id).visit(tree)
+    NNExtracter().visit(tree);
+    iterator(NNExtracter.cnnStatements, "Neural Network","nn.txt")
 
 
 if __name__ == "__main__":
