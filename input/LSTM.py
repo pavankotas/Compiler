@@ -34,14 +34,14 @@ X = pad_sequences(X)
 print(X)
 embed_dim = 128
 lstm_out = 196
-def createmodel():
-    model = Sequential()
-    model.add(Embedding(max_fatures, embed_dim,input_length = X.shape[1]))
-    model.add(SpatialDropout1D(0.4))
-    model.add(LSTM(lstm_out, dropout=0.2, recurrent_dropout=0.2))
-    model.add(Dense(2,activation='softmax'))
-    model.compile(loss = 'categorical_crossentropy', optimizer='adam',metrics = ['accuracy'])
-    return model
+
+model = Sequential()
+model.add(Embedding(max_fatures, embed_dim,input_length = X.shape[1]))
+model.add(SpatialDropout1D(0.4))
+model.add(LSTM(lstm_out, dropout=0.2, recurrent_dropout=0.2))
+model.add(Dense(2,activation='softmax'))
+model.compile(loss = 'categorical_crossentropy', optimizer='adam',metrics = ['accuracy'])
+
 # print(model.summary())
 
 labelencoder = LabelEncoder()
@@ -52,7 +52,6 @@ print(X_train.shape,Y_train.shape)
 print(X_test.shape,Y_test.shape)
 
 batch_size = 32
-model = createmodel()
 model.fit(X_train, Y_train, epochs = 5, batch_size=batch_size, verbose = 2)
 model.save('spam_model.h5')
 score,acc = model.evaluate(X_test,Y_test,verbose=2,batch_size=batch_size)

@@ -3,9 +3,13 @@ from ast import parse, Call, walk
 import importlib
 import inspect
 import astor
-
-from right_hand_side_visitor import  RHSVisitor
+import re
+from right_hand_side_visitor import RHSVisitor
 from label_visitor import LabelVisitor
+from ast_helper import generate_ast, get_call_names_as_string, Arguments
+import requests
+
+
 
 # Global Variable that stores the traceable paramaters of fit or fit_gen functions.
 traceParams= []
@@ -303,9 +307,21 @@ def iterator(ls, message, filename):
     file.close()
 
 
+def saveToDB(ls, message, filename):
+    fitParams = '(x|y|batch_size|epochs|verbose|callbacks|validation_split|validation_data|shuffle|class_weight|' \
+                'sample_weight|initial_epoch|steps_per_epoch|validation_steps|validation_steps)'
+    data = {}
+    for ob in ls:
+        ob = ob.split('=')
+        if re.search(fitParams, ob[0].strip()):
+            data[ob[0].strip()] = ob[1].strip()
+    data['experimentID'] = '1000'
+    print(data)
+    response = requests.post('http://localhost:4000/kerasfitparameters', json=data)
+
 # main function
 def main():
-    tree = astor.code_to_ast.parse_file('./input/WinePrice_Prediction_Functional_keras.py')
+    tree = astor.code_to_ast.parse_file('./input/cnn.py')
     analyzer = Analyzer()
     analyzer.visit(tree)
     iterator(analyzer.imports,"Import Statements","imports.txt")
@@ -315,6 +331,7 @@ def main():
     tracker = Tracker()
     tracker.visit(tree)
     iterator(tracker.paramsStatements,"Parameters backtrack","fitparams.txt")
+    saveToDB(tracker.paramsStatements,"Parameters backtrack","fitparams.txt")
     GlobalUseCollector(Analyzer.nn_target_id).visit(tree)
     NNExtracter().visit(tree);
     iterator(NNExtracter.cnnStatements, "Neural Network","nn.txt")

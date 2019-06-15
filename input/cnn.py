@@ -43,9 +43,6 @@ classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = [
 
 # Part 2 - Fitting the CNN to the images
 
-epochs = 5
-
-
 epochs = 10
 
 steps = steps_per_epoch= 8000
