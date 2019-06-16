@@ -292,50 +292,49 @@ class NNExtracter(ast.NodeVisitor):
                     NNExtracter.cnnStatements.append(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
 
 
-# Iterator utility function. It has 3 params
-# list to be written to file - ls
-# message to be shown on the top of the file
-# filename- filename to be created in the output
-def iterator(ls, message, filename):
-    file = open('./output/'+ filename,'a');
-    file.write("\n\n"+ message+": \n")
-    file.write("-------------------------- \n")
-    for ob in ls:
-        # print(ob)
-        file.write(str(ob)+"\n")
+class AST:
+    # Iterator utility function. It has 3 params
+    # list to be written to file - ls
+    # message to be shown on the top of the file
+    # filename- filename to be created in the output
+    def iterator(ls, message, filename):
+        file = open('./output/' + filename, 'a');
+        file.write("\n\n" + message + ": \n")
+        file.write("-------------------------- \n")
+        for ob in ls:
+            # print(ob)
+            file.write(str(ob) + "\n")
 
-    file.close()
+        file.close()
 
-
-def saveToDB(ls, message, filename):
-    fitParams = '(x|y|batch_size|epochs|verbose|callbacks|validation_split|validation_data|shuffle|class_weight|' \
-                'sample_weight|initial_epoch|steps_per_epoch|validation_steps|validation_steps)'
-    data = {}
-    for ob in ls:
-        ob = ob.split('=')
-        if re.search(fitParams, ob[0].strip()):
-            data[ob[0].strip()] = ob[1].strip()
-    data['experimentID'] = '1000'
-    print(data)
-    response = requests.post('http://localhost:4000/kerasfitparameters', json=data)
-
-# main function
-def main():
-    tree = astor.code_to_ast.parse_file('./input/cnn.py')
-    analyzer = Analyzer()
-    analyzer.visit(tree)
-    iterator(analyzer.imports,"Import Statements","imports.txt")
-    iterator(analyzer.importFroms, "Import From Statements","imports.txt")
-    iterator(analyzer.calls, "Function calls","calls.txt")
-    iterator(analyzer.fitParams,"Fit Parameters","fitparams.txt")
-    tracker = Tracker()
-    tracker.visit(tree)
-    iterator(tracker.paramsStatements,"Parameters backtrack","fitparams.txt")
-    saveToDB(tracker.paramsStatements,"Parameters backtrack","fitparams.txt")
-    GlobalUseCollector(Analyzer.nn_target_id).visit(tree)
-    NNExtracter().visit(tree);
-    iterator(NNExtracter.cnnStatements, "Neural Network","nn.txt")
+    # def saveToDB(ls, projName):
+    #     fitParams = '(x|y|batch_size|epochs|verbose|callbacks|validation_split|validation_data|shuffle|class_weight|' \
+    #                 'sample_weight|initial_epoch|steps_per_epoch|validation_steps|validation_steps)'
+    #     data = {}
+    #     for ob in ls:
+    #         ob = ob.split('=')
+    #         if re.search(fitParams, ob[0].strip()):
+    #             data[ob[0].strip()] = ob[1].strip()
+    #     data['experimentID'] = '1000'
+    #     print(data)
+    #     response = requests.post('http://localhost:4000/kerasfitparameters', json=data)
 
 
-if __name__ == "__main__":
-    main()
+    # main function
+    def ParseAst(self, path, projName):
+        tree = astor.code_to_ast.parse_file(path)
+        analyzer = Analyzer()
+        analyzer.visit(tree)
+        # self.iterator(analyzer.imports, "Import Statements", "imports.txt")
+        # self.iterator(analyzer.importFroms, "Import From Statements", "imports.txt")
+        # self.iterator(analyzer.calls, "Function calls", "calls.txt")
+        # self.iterator(analyzer.fitParams, "Fit Parameters", "fitparams.txt")
+        tracker = Tracker()
+        tracker.visit(tree)
+        # self.iterator(tracker.paramsStatements, "Parameters backtrack", "fitparams.txt")
+        GlobalUseCollector(Analyzer.nn_target_id).visit(tree)
+        NNExtracter().visit(tree)
+        # self.iterator(NNExtracter.cnnStatements, "Neural Network", "nn.txt")
+        hyperparamas = tracker.paramsStatements
+        return hyperparamas
+
