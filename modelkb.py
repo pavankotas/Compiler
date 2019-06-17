@@ -61,7 +61,7 @@ class Experiment:
         data['experimentID'] = '1000'
         data['projectName'] = projName
         print(data)
-        response = requests.post('http://localhost:4000/kerasfitparameters', json=data)
+        response = requests.post('https://testmodelhubbackend.herokuapp.com/kerasfitparameters', json=data)
 
 
 
