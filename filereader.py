@@ -45,3 +45,10 @@ def saveToRemote(experiment_id):
     res = requests.get('http://localhost:4000/kerasfitparameters/getParams/' + experiment_id)
     if res.status_code == 200:
         print("Your experiment has been pushed to public repository")
+def getAllExperiments():
+    res = requests.get('http://localhost:4000/kerasfitparameters/getallexperiments')
+    if res.status_code == 200:
+        print(res.content)
+
+getAllExperiments()
+saveToRemote('LSTM_061819-143828_c35c614a-1a80-4bef-9104-6c6aa26418d4')
