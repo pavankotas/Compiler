@@ -67,6 +67,8 @@ class Analyzer(ast.NodeVisitor):
                                     pars.append(k.n)
                             Analyzer.fitParams.append((kw.arg, pars))
                         if isinstance(kw.value, ast.Num):
+                            # traceParams.append(kw.arg)
+                            Tracker.paramsStatements.append(kw.arg + "=" + str(kw.value.n))
                             Analyzer.fitParams.append((kw.arg, kw.value.n))
                         if isinstance(kw.value, ast.Name):
                             traceParams.append(kw.value.id)
@@ -297,7 +299,7 @@ class AST:
     # list to be written to file - ls
     # message to be shown on the top of the file
     # filename- filename to be created in the output
-    def iterator(ls, message, filename):
+    def iterator(self, ls, message, filename):
         file = open('./output/' + filename, 'a');
         file.write("\n\n" + message + ": \n")
         file.write("-------------------------- \n")
@@ -321,7 +323,7 @@ class AST:
 
 
     # main function
-    def ParseAst(self, path, projName):
+    def ParseAst(self, path):
         tree = astor.code_to_ast.parse_file(path)
         analyzer = Analyzer()
         analyzer.visit(tree)
@@ -334,7 +336,9 @@ class AST:
         # self.iterator(tracker.paramsStatements, "Parameters backtrack", "fitparams.txt")
         GlobalUseCollector(Analyzer.nn_target_id).visit(tree)
         NNExtracter().visit(tree)
-        # self.iterator(NNExtracter.cnnStatements, "Neural Network", "nn.txt")
+        self.iterator(NNExtracter.cnnStatements, "Neural Network", "nn.txt")
         hyperparamas = tracker.paramsStatements
-        return hyperparamas
+        print(hyperparamas)
 
+obj = AST()
+obj.ParseAst('sample2.py')

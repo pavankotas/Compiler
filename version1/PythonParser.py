@@ -47,6 +47,7 @@ class Analyzer(ast.NodeVisitor):
                     args = node.args
                     for arg in args:
                         if isinstance(arg, ast.Str):
+                            traceParams.append(arg.s)
                             Analyzer.fitParams.append(arg.s)
                         if isinstance(arg, ast.Name):
                             traceParams.append(arg.id)
@@ -62,6 +63,7 @@ class Analyzer(ast.NodeVisitor):
                                     pars.append(k.n)
                             Analyzer.fitParams.append((kw.arg, pars))
                         if isinstance(kw.value, ast.Num):
+                            traceParams.append(kw.arg) #epochs
                             Analyzer.fitParams.append((kw.arg, kw.value.n))
                         if isinstance(kw.value, ast.Name):
                             traceParams.append(kw.value.id)
@@ -171,8 +173,8 @@ def main():
     tree = astor.code_to_ast.parse_file('cnn.py')
     analyzer = Analyzer()
     analyzer.visit(tree)
-    iterator(analyzer.imports,"Import Statements","imports.txt")
-    iterator(analyzer.importFroms, "Import From Statements","imports.txt")
+    # iterator(analyzer.imports,"Import Statements","imports.txt")
+    # iterator(analyzer.importFroms, "Import From Statements","imports.txt")
     iterator(analyzer.calls, "Function calls","calls.txt")
     iterator(analyzer.fitParams,"Fit Parameters","fitparams.txt")
     tracker = Tracker()

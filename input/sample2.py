@@ -15,6 +15,7 @@ import Xsequential
 #import numpy as np
 import matplotlib.pyplot as plt
 
+ep = 2
 print(tf.__version__)
 
 # import Fashion MINST from keras
@@ -22,7 +23,7 @@ fashion_mnist = keras.datasets.fashion_mnist
 
 # divide datasets into train and evaluation
 
-(train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+# (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
 
 class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
                'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
@@ -49,6 +50,6 @@ model.compile(optimizer='sgd',
               metrics=['accuracy'])
 
 
-history = model.fit(train_images, train_labels, epochs=2, batch_size=32)
+history = model.fit(train_images, train_labels, epochs= ep, batch_size=32)
 
 model.save('fashioncnn.h5')

@@ -21,7 +21,6 @@ from keras.layers import Dense
 # Initialising the CNN
 classifier = Sequential()
 
-epochsT = 5
 x,y = (64,64)
 
 # Step 1 - Convolution
@@ -67,7 +66,7 @@ test_set = test_datagen.flow_from_directory('dataset/test_set',
 
 classifier.fit_generator(training_set,
                          steps_per_epoch = 8000,
-                         epochs = epochsT,
+                         epochs = 2,
                          validation_data = test_set,
                          validation_steps = 2000)
 
