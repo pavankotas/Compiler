@@ -10,7 +10,6 @@ from ast_helper import generate_ast, get_call_names_as_string, Arguments
 import requests
 
 
-
 # Global Variable that stores the traceable paramaters of fit or fit_gen functions.
 traceParams= []
 
@@ -109,14 +108,27 @@ class Tracker(ast.NodeVisitor):
 
             elif isinstance(node.value, ast.Call):
                 call = None
+                # print(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
                 for element in node.targets[0].elts:
-                    if element.id in traceParams:
-                        label = LabelVisitor()
-                        label.visit(element)
-                        left_hand_label = label.result
-                        label = LabelVisitor()
-                        label.visit(node.value)
-                        Tracker.paramsStatements.append(left_hand_label + '=' + label.result)
+                    if isinstance(element,ast.Tuple):
+                        for tup in element.elts:
+                            # print(tup)
+                            if tup.id in traceParams:
+                                label = LabelVisitor()
+                                label.visit(tup)
+                                left_hand_label = label.result
+                                # print(left_hand_label)
+                                label = LabelVisitor()
+                                label.visit(node.value)
+                                Tracker.paramsStatements.append(left_hand_label + '=' + label.result)
+
+                    # if isinstance(element,ast.Name) & (element.id in traceParams):
+                    #     label = LabelVisitor()
+                    #     label.visit(element)
+                    #     left_hand_label = label.result
+                    #     label = LabelVisitor()
+                    #     label.visit(node.value)
+                    #     Tracker.paramsStatements.append(left_hand_label + '=' + label.result)
 
         elif len(node.targets) > 1:  # x = y = 3
             for target in node.targets:
@@ -294,6 +306,8 @@ class NNExtracter(ast.NodeVisitor):
                     NNExtracter.cnnStatements.append(astor.to_source(node, indent_with=' ' * 4, add_line_information=False))
 
 
+
+
 class AST:
     # Iterator utility function. It has 3 params
     # list to be written to file - ls
@@ -341,4 +355,4 @@ class AST:
         print(hyperparamas)
 
 obj = AST()
-obj.ParseAst('sample2.py')
+obj.ParseAst('input\sample2.py')

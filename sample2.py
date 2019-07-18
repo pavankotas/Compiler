@@ -56,4 +56,4 @@ X_train, X_test, Y_train, Y_test = train_test_split(X,y, test_size = 0.33, rando
 
 batch_size = 32
 
-model.fit(X_train, Y_train, epochs = 3, batch_size=batch_size, verbose = 2, validation_split=0.2)
+model.fit(X_train, Y_train, epochs = epochs, batch_size=batch_size, verbose = 2, validation_split=0.2)

@@ -8,11 +8,11 @@ import keras
 from keras.preprocessing import image
 from keras.utils import plot_model
 from keras.models import load_model
-import Xsequential
+# import Xsequential
 
 
 # Helper libraries
-#import numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 
 ep = 2
@@ -23,7 +23,9 @@ fashion_mnist = keras.datasets.fashion_mnist
 
 # divide datasets into train and evaluation
 
-# (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+(train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+
+# print(len(fashion_mnist.load_data()))
 
 class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
                'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
