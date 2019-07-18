@@ -80,7 +80,8 @@ class Analyzer(ast.NodeVisitor):
                                 if isinstance(k, ast.Num):
                                     pars.append(k.n)
                             Analyzer.fitParams.append((kw.arg, pars))
-                if value.attr in ["compile"]:
+
+                if value.attr in  ["compile"]:
                     Analyzer.nn_end_no = value.lineno
                     Analyzer.nn_target_id = value.value.id
 
